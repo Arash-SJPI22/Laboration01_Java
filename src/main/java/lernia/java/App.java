@@ -41,14 +41,15 @@ public class App {
 
     // Prints out the menu options and returns the first character from the user input
     public static char printMenu() {
-        System.out.println("Elpriser" +
-                "\n========" +
-                "\n1. Inmatning" +
-                "\n2. Min, Max och Medel" +
-                "\n3. Sortera" +
-                "\n4. Bästa Laddningstid (4h)" +
-                "\n5. Inläsning från fil (./priser.csv)" +
-                "\ne. Avsluta");
+        System.out.println("""
+                Elpriser
+                ========
+                1. Inmatning
+                2. Min, Max och Medel
+                3. Sortera
+                4. Bästa Laddningstid (4h)
+                5. Inläsning från fil (./priser.csv)
+                e. Avsluta""");
 
         System.out.print("Välj ett meny val: ");
         Scanner scanner = new Scanner(System.in);
@@ -64,18 +65,7 @@ public class App {
             int price = -1;
 
             do {
-                System.out.print("Mata in priset per timme i ören per kWh mellan tiderna - ");
-
-                if (i < 10)
-                    System.out.print("0" + i);
-                else
-                    System.out.print(i);
-                System.out.print(" - ");
-
-                if (i + 1 < 10)
-                    System.out.print("0" + (i + 1) + ": ");
-                else
-                    System.out.print(i+1 + ": ");
+                System.out.print("Mata in priset per timme i ören per kWh mellan tiderna - " + sanitizeHourOutput(i));
 
                 Scanner scanner = new Scanner(System.in);
                 try {
@@ -98,6 +88,49 @@ public class App {
     }
 
     public static void priceCompare(int[] priceList){
-        System.out.println(Arrays.toString(priceList));
+        int min = 0;
+        int minHour = -1;
+        int max = 0;
+        int maxHour = -1;
+        int avrg = 0;
+
+        for (int i = 0; i < priceList.length; i++) {
+
+            avrg += priceList[i];
+            // Exception . if two or more prices are equal the last one in the array will set as the max and that hour will be set as that (same for min)
+            if (Math.max(max, priceList[i]) == priceList[i]) {
+                maxHour = i;
+                max = priceList[i];
+            }
+
+            if (Math.min(min, priceList[i]) == priceList[i]) {
+                minHour = i;
+                min = priceList[i];
+            }
+        }
+
+        double avrgTot = (double) avrg / priceList.length;
+
+        System.out.println("Det högsta priset under dynget var: " + max + " öre per kWh och skedde mellan kl." + sanitizeHourOutput(maxHour));
+        System.out.println("Det lägsta priset under dynget var: " + min + " öre per kWh och skedde mellan kl." + sanitizeHourOutput(minHour));
+        System.out.println("Medel priset under dynget var: " + avrgTot + " öre per kWh");
+
+
+    }
+
+    public static String sanitizeHourOutput (int hour) {
+        String time;
+        if (hour < 10)
+            time = "0" + hour;
+        else
+            time = "" + hour;
+        time += " - ";
+
+        if (hour + 1 < 10)
+            time += "0" + (hour + 1) + ": ";
+        else
+            time += (hour + 1) + ": ";
+
+        return time;
     }
 }
