@@ -116,9 +116,9 @@ public class App {
             }
         }
 
-        System.out.println("\nDet högsta priset under dynget var: " + max + " öre per kWh och skedde mellan kl " + sanitizeHourOutput(maxHour));
-        System.out.println("Det lägsta priset under dynget var: " + min + " öre per kWh och skedde mellan kl " + sanitizeHourOutput(minHour));
-        System.out.println("Medel priset under dynget var: " + (avrg / pList.length) + " öre per kWh\n");
+        System.out.println("\nDet högsta priset under dygnet var: " + max + " öre per kWh och skedde mellan kl " + sanitizeHourOutput(maxHour));
+        System.out.println("Det lägsta priset under dygnet var: " + min + " öre per kWh och skedde mellan kl " + sanitizeHourOutput(minHour));
+        System.out.println("Medel priset under dygnet var: " + (avrg / pList.length) + " öre per kWh\n");
 
 
     }
