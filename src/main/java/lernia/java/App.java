@@ -1,5 +1,6 @@
 package lernia.java;
 
+import java.io.*;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -8,7 +9,8 @@ public class App {
     public static void main(String[] args) {
 
         char choice;
-
+        boolean dataPopulated = false;
+        // Creates a PriceList array and initiates it.
         PriceList[] priceList = new PriceList[24];
         for (int i=0; i<priceList.length; i++) {
             priceList[i] = new PriceList();
@@ -24,9 +26,9 @@ public class App {
                 if (choice == '1')
                     enterPrices(priceList);
                 else {
-                    // if the user have not entered values in choice 1 yet.
-                    if (priceList[0].price == 0)
-                        System.out.println("\n<== Du måste först mata in värden under meny val 1. Gör det och återkomm sen! == >\n");
+                    // if the user have not entered values in choice 1 or 5 yet.
+                    if (!dataPopulated)
+                        System.out.println("\n<== Du måste först mata in värden under meny val 1 eller 5. Gör det och återkom sen! == >\n");
                     else {
                         if (choice == '2')
                             priceCompare(priceList);
@@ -34,12 +36,20 @@ public class App {
                             sortMyPrices(priceList);
                         else if (choice == '4')
                             bestChargingTime(priceList);
-
                     }
                 }
 
             } else if (choice == '5') {
-                System.out.println("Val 5");
+                try {
+                    if (readFromFile(priceList)) {
+                        dataPopulated = true;
+                        System.out.println("\n<== Fil \"priser.csv\" inläst utan problem ==>");
+                    } else
+                        System.out.println("\n<== Fel vid inläsning av fil, kontrollera att filens innehåll är rätt formaterad ==>\n");
+
+                } catch (IOException e) {
+                    System.out.println("\n<== Fil ej inläst. Problem uppstod: " + e + " ==>\n");
+                }
 
             } else if (choice == 'e' || choice == 'E')
                 System.out.println("\n<== Programmet avslutas! ==>");
@@ -60,7 +70,7 @@ public class App {
                 2. Min, Max och Medel
                 3. Sortera
                 4. Bästa Laddningstid (4h)
-                5. Inläsning från fil (./priser.csv)
+                5. Inläsning från fil (priser.csv)
                 e. Avsluta
                 """);
 
@@ -104,7 +114,7 @@ public class App {
         for (int i = 0; i < pList.length; i++) {
 
             avrg += pList[i].price;
-            // Exception . if two or more prices are equal the last one in the array will set as the max and that hour will be set as that (same for min)
+            // Exception . if two or more prices are equal the last one in the array will be set as the max and that hour will be set as that (same for min)
             if (Math.max(max, pList[i].price) == pList[i].price) {
                 maxHour = i;
                 max = pList[i].price;
@@ -119,8 +129,6 @@ public class App {
         System.out.println("\nDet högsta priset under dygnet var: " + max + " öre per kWh och skedde mellan kl " + sanitizeHourOutput(maxHour));
         System.out.println("Det lägsta priset under dygnet var: " + min + " öre per kWh och skedde mellan kl " + sanitizeHourOutput(minHour));
         System.out.println("Medel priset under dygnet var: " + (avrg / pList.length) + " öre per kWh\n");
-
-
     }
 
     // Menu option 3
@@ -177,7 +185,25 @@ public class App {
         else
             System.out.print(bestTime);
 
-        System.out.println(", medelpriset blir då ca: " + bestPrice / 4 + " öre kWh.\n");
+        System.out.println(", medelpriset blir då ca: " + (bestPrice / 4) + " öre kWh.\n");
+    }
+
+    // Menu option 5
+    public static boolean readFromFile (PriceList[] pList) throws IOException {
+
+        boolean fileReadCorrectly = true;
+        Scanner fileStream = new Scanner(new File("./src/main/java/lernia/java/priser.csv"));
+        fileStream.useDelimiter(",");
+
+        for (int i=0; i<pList.length; i++) {
+            try {
+                pList[i].hour = fileStream.nextInt();
+                pList[i].price = fileStream.nextInt();
+            } catch (Exception e) {
+                fileReadCorrectly = false;
+            }
+        }
+        return fileReadCorrectly;
     }
 
     // Misc methods
@@ -186,6 +212,8 @@ public class App {
     public static boolean checkPriceRange(int price) {
         return (price > 0 && price < 10000000);
     }
+
+    // Adds an 0 before the hour if it is less than 10. Returns a string in the format "01 - 02"
     public static String sanitizeHourOutput (int hour) {
         String time;
         if (hour < 10)
