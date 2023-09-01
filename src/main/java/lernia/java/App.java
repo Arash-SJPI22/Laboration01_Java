@@ -5,7 +5,6 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class App {
-
     public static void main(String[] args) {
 
         char choice;
@@ -158,8 +157,8 @@ public class App {
             }
         }
 
-        for (int i=0; i<sortedList.length; i++) {
-            System.out.println(sanitizeHourOutput(sortedList[i].hour) + " " + sortedList[i].price + " öre");
+        for (PriceList price : sortedList) {
+            System.out.println(sanitizeHourOutput(price.hour) + " " + price.price + " öre");
         }
     }
 
@@ -195,10 +194,10 @@ public class App {
         Scanner fileStream = new Scanner(new File("./src/main/java/lernia/java/priser.csv"));
         fileStream.useDelimiter(",");
 
-        for (int i=0; i<pList.length; i++) {
+        for (PriceList price : pList) {
             try {
-                pList[i].hour = fileStream.nextInt();
-                pList[i].price = fileStream.nextInt();
+                price.hour = fileStream.nextInt();
+                price.price = fileStream.nextInt();
             } catch (Exception e) {
                 fileReadCorrectly = false;
             }
@@ -229,5 +228,10 @@ public class App {
             time += (hour + 1) + ": ";
 
         return time;
+    }
+
+    public static class PriceList {
+        int hour;
+        int price;
     }
 }
