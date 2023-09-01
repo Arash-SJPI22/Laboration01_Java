@@ -115,12 +115,12 @@ public class App {
             avrg += pList[i].price;
             // Exception . if two or more prices are equal the last one in the array will be set as the max and that hour will be set as that (same for min)
             if (Math.max(max, pList[i].price) == pList[i].price) {
-                maxHour = i;
+                maxHour = pList[i].hour;
                 max = pList[i].price;
             }
 
             if (Math.min(min, pList[i].price) == pList[i].price) {
-                minHour = i;
+                minHour = pList[i].hour;
                 min = pList[i].price;
             }
         }
