@@ -22,8 +22,10 @@ public class App {
 
             // If choice is 1-4
             if ( (Character.getNumericValue(choice) > 0) && (Character.getNumericValue(choice) <= 4) ) {
-                if (choice == '1')
+                if (choice == '1') {
                     enterPrices(priceList);
+                    dataPopulated = true;
+                }
                 else {
                     // if the user have not entered values in choice 1 or 5 yet.
                     if (!dataPopulated)
@@ -228,10 +230,5 @@ public class App {
             time += (hour + 1) + ": ";
 
         return time;
-    }
-
-    public static class PriceList {
-        int hour;
-        int price;
     }
 }
