@@ -10,10 +10,10 @@ public class App {
         char choice;
         boolean dataPopulated = false;
         // Creates a PriceList array and initiates it.
-        PriceList[] priceList = new PriceList[24];
-        for (int i=0; i<priceList.length; i++) {
-            priceList[i] = new PriceList();
-            priceList[i].hour = i;
+        int[][] priceList = new int[24][2];
+
+        for(int i=0; i<priceList.length; i++) {
+            priceList[i][0] = i;
         }
 
         // Do while choice != e / E
@@ -82,13 +82,13 @@ public class App {
 
 
     // Menu option 1
-    public static void enterPrices (PriceList[] pList) {
+    public static void enterPrices (int[][] pList) {
 
         for( int i = 0; i < pList.length; i++) {
             int price = -1;
 
             do {
-                System.out.print("Mata in priset per timme i ören per kWh mellan tiderna - " + sanitizeHourOutput(pList[i].hour));
+                System.out.print("Mata in priset per timme i ören per kWh mellan tiderna - " + sanitizeHourOutput(pList[i][0]));
 
                 Scanner scanner = new Scanner(System.in);
                 try {
@@ -99,13 +99,13 @@ public class App {
 
             } while (!checkPriceRange(price));
 
-            pList[i].price = price;
+            pList[i][1] = price;
         }
     }
 
 
     // Menu option 2
-    public static void priceCompare(PriceList[] pList){
+    public static void priceCompare(int[][] pList){
         int min = Integer.MAX_VALUE;
         int minHour = -1;
         int max = 0;
@@ -114,16 +114,16 @@ public class App {
 
         for (int i = 0; i < pList.length; i++) {
 
-            avrg += pList[i].price;
+            avrg += pList[i][1];
             // Exception . if two or more prices are equal the last one in the array will be set as the max and that hour will be set as that (same for min)
-            if (Math.max(max, pList[i].price) == pList[i].price) {
-                maxHour = pList[i].hour;
-                max = pList[i].price;
+            if (Math.max(max, pList[i][1]) == pList[i][1]) {
+                maxHour = pList[i][0];
+                max = pList[i][1];
             }
 
-            if (Math.min(min, pList[i].price) == pList[i].price) {
-                minHour = pList[i].hour;
-                min = pList[i].price;
+            if (Math.min(min, pList[i][1]) == pList[i][1]) {
+                minHour = pList[i][0];
+                min = pList[i][1];
             }
         }
 
@@ -133,14 +133,13 @@ public class App {
     }
 
     // Menu option 3
-    public static void sortMyPrices (PriceList[] pList) {
+    public static void sortMyPrices (int[][] pList) {
 
-        PriceList[] sortedList = new PriceList[24];
+        int[][] sortedList = new int[24][2];
 
         for (int i=0; i<pList.length; i++) {
-            sortedList[i] = new PriceList();
-            sortedList[i].price = pList[i].price;
-            sortedList[i].hour = pList[i].hour;
+            sortedList[i][1] = pList[i][1];
+            sortedList[i][0] = pList[i][0];
         }
 
         for (int i=0; i<sortedList.length; i++) {
@@ -148,33 +147,33 @@ public class App {
             int tmpHour;
 
             for (int j=0; j<sortedList.length; j++) {
-                if (sortedList[i].price < sortedList[j].price) {
-                    tmpPrice = sortedList[i].price;
-                    tmpHour = sortedList[i].hour;
-                    sortedList[i].price = sortedList[j].price;
-                    sortedList[i].hour = sortedList[j].hour;
-                    sortedList[j].price = tmpPrice;
-                    sortedList[j].hour = tmpHour;
+                if (sortedList[i][1] < sortedList[j][1]) {
+                    tmpPrice = sortedList[i][1];
+                    tmpHour = sortedList[i][0];
+                    sortedList[i][1] = sortedList[j][1];
+                    sortedList[i][0] = sortedList[j][0];
+                    sortedList[j][1] = tmpPrice;
+                    sortedList[j][0] = tmpHour;
                 }
             }
         }
 
-        for (PriceList price : sortedList) {
-            System.out.println(sanitizeHourOutput(price.hour) + " " + price.price + " öre");
+        for (int i=0; i<sortedList.length; i++) {
+            System.out.println(sanitizeHourOutput(sortedList[i][0]) + " " + sortedList[i][1] + " öre");
         }
     }
 
     // Menu option 4
-    public static void bestChargingTime(PriceList[] pList) {
+    public static void bestChargingTime(int[][] pList) {
         int bestPrice = Integer.MAX_VALUE;
         int bestTime = 0;
 
         for (int i=0; i<(pList.length - 3); i++) {
 
-            int price = pList[i].price + pList[i+1].price + pList[i+2].price + pList[i+3].price;
+            int price = pList[i][1] + pList[i+1][1] + pList[i+2][1] + pList[i+3][1];
 
             if (price < bestPrice) {
-                bestTime = pList[i].hour;
+                bestTime = pList[i][0];
                 bestPrice = price;
             }
         }
@@ -190,16 +189,16 @@ public class App {
     }
 
     // Menu option 5
-    public static boolean readFromFile (PriceList[] pList) throws IOException {
+    public static boolean readFromFile (int[][] pList) throws IOException {
 
         boolean fileReadCorrectly = true;
         Scanner fileStream = new Scanner(new File("./src/main/java/lernia/java/priser.csv"));
         fileStream.useDelimiter(",");
 
-        for (PriceList price : pList) {
+        for (int i=0; i<pList.length; i++) {
             try {
-                price.hour = fileStream.nextInt();
-                price.price = fileStream.nextInt();
+                pList[i][0] = fileStream.nextInt();
+                pList[i][1] = fileStream.nextInt();
             } catch (Exception e) {
                 fileReadCorrectly = false;
             }
